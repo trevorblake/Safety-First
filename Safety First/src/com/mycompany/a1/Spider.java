@@ -33,6 +33,13 @@ public class Spider extends Movable
 	public void setSpeed(int x) {}
 	
 	/**
+	 * Empty setter method to change the color so that other 
+	 * classes are not able to alter the color of Spider objects
+	 * after instantiation.
+	 */
+	public void setColor(int x) {}
+	
+	/**
 	 * From the Movable abstract parent class, this method
 	 * moves the spider object using simple trig functions. 
 	 * First checks to make sure spider's next move is within bounds

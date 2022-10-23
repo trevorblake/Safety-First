@@ -126,7 +126,10 @@ public class Game extends Form
 					case 'x': // User enters 'x' to begin the exit prompt
 						xGiven = true;
 						System.out.println("\nPlease type 'y' to exit or 'n' to continue...");
-						break; 
+						break;
+						
+					default: // User enters any other command
+						System.out.println("\nPlease type a proper command key.");
 					
 					}
 				}	//add code to handle rest of the commands  

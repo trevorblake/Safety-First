@@ -38,6 +38,13 @@ public class Flag extends Fixed
 	}	
 	
 	/**
+	 * Empty setter method to change the color so that other 
+	 * classes are not able to alter the color of Flag objects
+	 * after instantiation.
+	 */
+	public void setColor(int x) {}
+	
+	/**
 	 * toString method that returns a string of the data
 	 * associated with flags. Such as a flag's location,
 	 * color, size, and sequence number.
