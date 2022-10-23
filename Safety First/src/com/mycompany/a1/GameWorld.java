@@ -1,6 +1,7 @@
 package com.mycompany.a1;
 
 import java.util.ArrayList;
+import java.util.Observable;
 import java.util.Random;
 
 import com.codename1.charts.models.Point;
@@ -13,12 +14,12 @@ import com.codename1.charts.util.ColorUtil;
  * holding the methods of which to manipulate the various game objects
  * @author Trevor Blake
  */
-public class GameWorld 
+public class GameWorld extends Observable
 {
 	private ArrayList <GameObject> worldObjects = new ArrayList<GameObject>(); // Holds all game objects
 	private int gameClock = 0; // The amount of time/ticks the game has been played, starting at 0
 	private int antLives = 3; // The number of lives the ant has, starting at 3
-	
+	 
 	/**
 	 * Initializes the game by instantiating all of the game objects, setting distinct flag sequence numbers
 	 * and flag locations, and making sure the ant object starts at the first flag. Randomizes many 
@@ -32,7 +33,7 @@ public class GameWorld
 		worldObjects.add(new Flag(2, 10, ColorUtil.GREEN, new Point(700, 200)));
 		worldObjects.add(new Flag(3, 10, ColorUtil.GREEN, new Point(300, 700)));
 		worldObjects.add(new Flag(4, 10, ColorUtil.GREEN, new Point(700, 800)));
-		worldObjects.add(new Ant(8, ColorUtil.rgb(255, 0, 0), 
+		worldObjects.add(Ant.getAnt(8, ColorUtil.rgb(255, 0, 0), 
 				new Point(worldObjects.get(0).getLocation().getX(), worldObjects.get(0).getLocation().getY()), 0, 4));
 		worldObjects.add(new Spider(10 + rand.nextInt(41),ColorUtil.rgb(0, 0, 0), 
 				new Point (rand.nextInt(1001), rand.nextInt(1001)), rand.nextInt(360), 5 + rand.nextInt(6)));

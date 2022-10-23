@@ -18,7 +18,7 @@ public class Ant extends Movable implements ISteerable
 	private int foodConsumptionRate; // How quickly the ant loses foodLevel
 	private int healthLevel; // The health of the ant
 	private int lastFlagReached; // The last flag reached by the ant
-
+	private static Ant theAnt;
 	/**
 	 * Constructor for the Ant object. Calls to Movable parent class to create
 	 * a Movable Ant object. Set parameters to Movable as 8 for size, red for
@@ -26,7 +26,7 @@ public class Ant extends Movable implements ISteerable
 	 * @param location when instantiated in the GameWorld class, the ant location
 	 * 		  must begin at the first flag location
 	 */
-	public Ant(int size, int color, Point location, int heading, int speed) 
+	private Ant(int size, int color, Point location, int heading, int speed) 
 	{
 		super(size, color, location, heading, speed);
 		maximumSpeed = 20;
@@ -34,6 +34,15 @@ public class Ant extends Movable implements ISteerable
 		foodConsumptionRate = 1;
 		healthLevel = 10;
 		lastFlagReached = 1;
+	}
+	
+	public static Ant getAnt(int size, int color, Point location, int heading, int speed)
+	{
+		if (theAnt == null)
+		{
+			theAnt = new Ant(size, color, location, heading, speed);
+		}
+		return theAnt;
 	}
 
 	/**
