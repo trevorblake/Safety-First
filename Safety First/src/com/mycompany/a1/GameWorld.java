@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.codename1.charts.models.Point;
 import com.codename1.charts.util.ColorUtil;
+import com.codename1.ui.Display;
 
 /**
  * The GameWorld class handles the initialization of the game by
@@ -17,8 +18,22 @@ import com.codename1.charts.util.ColorUtil;
 public class GameWorld extends Observable
 {
 	private ArrayList <GameObject> worldObjects = new ArrayList<GameObject>(); // Holds all game objects
-	private int gameClock = 0; // The amount of time/ticks the game has been played, starting at 0
-	private int antLives = 3; // The number of lives the ant has, starting at 3
+	private int gameClock; // The amount of time/ticks the game has been played, starting at 0
+	private int antLives; // The number of lives the ant has, starting at 3
+	private int height;
+	private int width;
+	private int nextFlag;
+	private boolean sound;
+	
+	public GameWorld()
+	{
+		gameClock = 0;
+		antLives = 3;
+		height = 0;
+		width = 0;
+		nextFlag = 2;
+		sound = false;
+	}
 	 
 	/**
 	 * Initializes the game by instantiating all of the game objects, setting distinct flag sequence numbers
@@ -33,16 +48,45 @@ public class GameWorld extends Observable
 		worldObjects.add(new Flag(2, 10, ColorUtil.GREEN, new Point(700, 200)));
 		worldObjects.add(new Flag(3, 10, ColorUtil.GREEN, new Point(300, 700)));
 		worldObjects.add(new Flag(4, 10, ColorUtil.GREEN, new Point(700, 800)));
-		worldObjects.add(Ant.getAnt(8, ColorUtil.rgb(255, 0, 0), 
-				new Point(worldObjects.get(0).getLocation().getX(), worldObjects.get(0).getLocation().getY()), 0, 4));
+		Ant a = Ant.getAnt(8, ColorUtil.rgb(255, 0, 0), new Point(worldObjects.get(0).getLocation().getX(), 
+				worldObjects.get(0).getLocation().getY()), 0, 4);
+		worldObjects.add(a);
 		worldObjects.add(new Spider(10 + rand.nextInt(41),ColorUtil.rgb(0, 0, 0), 
-				new Point (rand.nextInt(1001), rand.nextInt(1001)), rand.nextInt(360), 5 + rand.nextInt(6)));
+				new Point (rand.nextInt(width), rand.nextInt(height)), rand.nextInt(360), 5 + rand.nextInt(6)));
 		worldObjects.add(new Spider(10 + rand.nextInt(41),ColorUtil.rgb(0, 0, 0), 
-				new Point (rand.nextInt(1001), rand.nextInt(1001)), rand.nextInt(360), 5 + rand.nextInt(6)));
+				new Point (rand.nextInt(width), rand.nextInt(height)), rand.nextInt(360), 5 + rand.nextInt(6)));
 		worldObjects.add(new FoodStation(10 + rand.nextInt(41),ColorUtil.rgb(0,255,0), 
-				new Point (rand.nextInt(1001), rand.nextInt(1001))));
+				new Point (rand.nextInt(width), rand.nextInt(height))));
 		worldObjects.add(new FoodStation(10 + rand.nextInt(41),ColorUtil.rgb(0,255,0), 
-				new Point (rand.nextInt(1001), rand.nextInt(1001))));
+				new Point (rand.nextInt(width), rand.nextInt(height))));
+		System.out.println(width + " gw " + height);
+		setChanged();
+		notifyObservers(a);
+		setChanged();
+		notifyObservers(this);
+		
+	}
+	
+	public int getTime()
+	{
+		return gameClock;
+	}
+	
+	public int getLives()
+	{
+		return antLives;
+	}
+	
+	public boolean getSound()
+	{
+		return sound;
+	}
+	
+	public void setSound(boolean newSound)
+	{
+		sound = newSound;
+		setChanged();
+		notifyObservers(this);
 	}
 	
 	/**
@@ -67,14 +111,19 @@ public class GameWorld extends Observable
 				if(aObj.getSpeed() + increaseBy >= realMax)
 				{
 					aObj.setSpeed((int) realMax);
+					
 				}
 				
 				else
 				{
 					aObj.setSpeed(increaseBy + aObj.getSpeed());
 				}
+				
+				setChanged();
+				notifyObservers(aObj);
 			}
 		}
+
 	}
 	
 	/**
@@ -102,8 +151,12 @@ public class GameWorld extends Observable
 				{
 					aObj.setSpeed(aObj.getSpeed() - decreaseBy);
 				}
+				
+				setChanged();
+				notifyObservers(aObj);
 			}
 		}
+
 	}
 	
 	/**
@@ -119,6 +172,8 @@ public class GameWorld extends Observable
 			{
 				Ant aObj = (Ant) worldObjects.get(i);
 				aObj.adjustHeading(amount);
+				setChanged();
+				notifyObservers(aObj);
 			}
 		}
 	}
@@ -134,23 +189,42 @@ public class GameWorld extends Observable
 	{
 		gameClock++;
 		Ant aObj = null;
+		int headingChange;
+		
 	  	for (int i = 0; i < worldObjects.size(); i++) 
 	  	{ 
 	  		if (worldObjects.get(i) instanceof Ant) 
 	  		{ 
 	  			aObj = (Ant) worldObjects.get(i); 
 	  			aObj.setFoodLevel(aObj.getFoodLevel() - 1);
+	  			aObj.move();
+	  			setChanged();
+	  			notifyObservers(aObj);
 	  		}   
 	  	} 
 			
 		for (int i = 0; i < worldObjects.size(); i++) 
 		{ 
-			if (worldObjects.get(i) instanceof Movable) 
+			if (worldObjects.get(i) instanceof Spider) 
 		  	{ 
-		  		Movable mObj = (Movable) worldObjects.get(i); 
-		  		mObj.move();  
+		  		Spider sObj = (Spider) worldObjects.get(i); 
+		  		sObj.move();
+		  		
+				if(sObj.getLocation().getX() >= width || sObj.getLocation().getY() >= height || 
+						sObj.getLocation().getX() <= 0 || sObj.getLocation().getY() <= 0)
+				{
+					headingChange = sObj.getHeading() + 180;
+					sObj.setHeading(headingChange);	
+					sObj.move();
+
+				}				
 		  	}   
 		} 
+		
+		setChanged();
+		notifyObservers(aObj);
+		setChanged();
+		notifyObservers(this);
 		
 		if(aObj.getHealthLevel() <= 0 || aObj.getFoodLevel() <= 0)
 		{
@@ -165,7 +239,13 @@ public class GameWorld extends Observable
 				worldObjects.clear();
 				init();
 			}
-		}
+		}	
+
+	}
+	
+	public int getNextFlag()
+	{
+		return nextFlag;
 	}
 	
 	/**
@@ -207,9 +287,12 @@ public class GameWorld extends Observable
 					  System.out.println("\nProper flagSequence number: lastFlagReached of " + 
 						(aObj.getLastFlagReached()-1) + " increased by 1. \nlastFlagReached is now: "
 							  + aObj.getLastFlagReached());
+			  		  setChanged();
+			  		  notifyObservers(aObj);
 				  }	  
 			  }
-		  } 
+		  }   
+		  nextFlag++;
 		  
 		  if(aObj.getLastFlagReached() == totalFlags)
 		  {
@@ -245,10 +328,13 @@ public class GameWorld extends Observable
 		  } while(fObj.getCapacity() == 0);
 
 		  aObj.setFoodLevel(aObj.getFoodLevel() + fObj.getCapacity());
+		setChanged();
+		notifyObservers(aObj);
 		  fObj.setColor(ColorUtil.rgb(0, 100, 0));
 		  fObj.setCapacity(0);
 		  worldObjects.add(new FoodStation(10 + rand.nextInt(41),ColorUtil.rgb(0,255,0), 
-					new Point (rand.nextInt(1001), rand.nextInt(1001))));	  
+					new Point (rand.nextInt(width), rand.nextInt(height))));	
+
 	}
 	
 	/**
@@ -276,7 +362,12 @@ public class GameWorld extends Observable
 			if(aObj.getSpeed() > realMax)
 			{
 				aObj.setSpeed((int) realMax);
+	  			setChanged();
+	  			notifyObservers(aObj);
 			}
+			
+  			setChanged();
+  			notifyObservers(aObj);
 		  
 			if(aObj.getHealthLevel() <= 0)
 			{
@@ -291,7 +382,8 @@ public class GameWorld extends Observable
 					worldObjects.clear();
 					init();
 				}
-		  }
+		   }
+
 	}
 	
 	/**
@@ -300,31 +392,6 @@ public class GameWorld extends Observable
 	 * foodLevel, and ant's healthLevel
 	 * @return
 	 */
-	public String gameInfo() 
-	{	
-		  Ant aObj = null;
-		  for (int i = 0; i < worldObjects.size(); i++) 
-		  { 
-			  if (worldObjects.get(i) instanceof Ant) 
-			  { 
-				  aObj = (Ant) worldObjects.get(i); 
-			  }
-		  }
-		  
-		return "\nNumber of lives left: " + antLives +
-				"\nCurrent clock value: " + gameClock +
-				"\nHighest flag number reached: " + aObj.getLastFlagReached() +
-				"\nAnt's current food level: " + aObj.getFoodLevel() +
-				"\nAnt's current health level: " + aObj.getHealthLevel();
-	}
-	
-	/**
-	 * Forces the game to exit without any message to console, used in the Game class
-	 */
-	public void exit() 
-	{
-		System.exit(0);
-	}
 	
 	/**
 	 * Forces the game to exit when the ant lives has reached 0 and leaves a
@@ -333,7 +400,7 @@ public class GameWorld extends Observable
 	public void exitFailure() 
 	{
 		System.out.println("\nGame over, you failed!");
-		System.exit(0);
+		Display.getInstance().exitApplication();
 	}
 	
 	/**
@@ -343,9 +410,28 @@ public class GameWorld extends Observable
 	public void exitSuccess() 
 	{
 		System.out.println("\nGame over, you win! Total time: " + gameClock);
-		System.exit(0);
+		Display.getInstance().exitApplication();
 	}
 	
+	public int getHeight()
+	{
+		return height;
+	}
+	
+	public void setHeight(int newHeight) 
+	{
+		height = newHeight;
+	}
+	
+	public int getWidth()
+	{
+		return width;
+	}
+	
+	public void setWidth(int newWidth) 
+	{
+		width = newWidth;
+	}
 	
 	/**
 	 * toString method that bundles together all of the game objects toString methods 

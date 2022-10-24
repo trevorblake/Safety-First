@@ -43,7 +43,7 @@ public class Spider extends Movable
 	 * From the Movable abstract parent class, this method
 	 * moves the spider object using simple trig functions. 
 	 * First checks to make sure spider's next move is within bounds
-	 * of the gameWorld (0...1000,0...1000). If it is going to be
+	 * of the gameWorld (width, height). If it is going to be
 	 * outside of bounds, it does not set the newX and newY and 
 	 * instead changes the heading by 180 degrees and calls
 	 * move() recursively until its next move is in the bounds.
@@ -60,41 +60,21 @@ public class Spider extends Movable
 		float newX = (float) (getLocation().getX() + deltaX);
 		float newY = (float) (getLocation().getY() + deltaY);
 		headingChange = getHeading() - 5 + rand.nextInt(11);
-		if(newX >= 1000 || newY >= 1000 || newX <= 0 || newY <= 0)
+
+		getLocation().setX(newX);
+		getLocation().setY(newY);
+			
+		if(headingChange < 0)
 		{
-			headingChange = getHeading() + 180;
-			
-			if(headingChange < 0)
-			{
-				headingChange += 360;
-			}
-			
-			if(headingChange >= 360)
-			{
-				headingChange -= 360;
-			}
-			
-			setHeading(headingChange);	
-			
-			move();
+			headingChange += 360;
 		}
-		
-		else 
+			
+		if(headingChange >= 360)
 		{
-			getLocation().setX(newX);
-			getLocation().setY(newY);
-			
-			if(headingChange < 0)
-			{
-				headingChange += 360;
-			}
-			
-			if(headingChange >= 360)
-			{
-				headingChange -= 360;
-			}	
-			setHeading(headingChange);		
+			headingChange -= 360;
 		}	
+		setHeading(headingChange);		
+			
 	}
 	
 	/**
