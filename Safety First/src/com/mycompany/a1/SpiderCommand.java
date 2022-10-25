@@ -3,6 +3,9 @@ package com.mycompany.a1;
 import com.codename1.ui.Command;
 import com.codename1.ui.events.ActionEvent;
 
+/**
+ * Calls the collidedSpider GameWorld method based on action event
+ */
 public class SpiderCommand extends Command
 {
 	private GameWorld tgw;
@@ -15,6 +18,5 @@ public class SpiderCommand extends Command
 	public void actionPerformed(ActionEvent evt)
 	{
 		tgw.collidedSpider();
-		System.out.println("\nThe ant has collided with a spider.");
 	}
 }

@@ -3,6 +3,9 @@ package com.mycompany.a1;
 import com.codename1.ui.Command;
 import com.codename1.ui.events.ActionEvent;
 
+/**
+ * Calls the turnAnt GameWorld method based on action event
+ */
 public class RightTurnCommand extends Command
 {
 	private GameWorld tgw;
@@ -15,6 +18,5 @@ public class RightTurnCommand extends Command
 	public void actionPerformed(ActionEvent evt)
 	{
 		tgw.turnAnt(5);
-		System.out.println("\nThe ant has changed heading 5 degrees to the right.");
 	}
 }

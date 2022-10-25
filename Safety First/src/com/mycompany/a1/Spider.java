@@ -43,10 +43,7 @@ public class Spider extends Movable
 	 * From the Movable abstract parent class, this method
 	 * moves the spider object using simple trig functions. 
 	 * First checks to make sure spider's next move is within bounds
-	 * of the gameWorld (width, height). If it is going to be
-	 * outside of bounds, it does not set the newX and newY and 
-	 * instead changes the heading by 180 degrees and calls
-	 * move() recursively until its next move is in the bounds.
+	 * of the gameWorld (width, height). 
 	 * Adds an additional random change of heading ranging 
 	 * from -5 to 5. Also checks if new heading is within the 
 	 * range of 0 to 359. This method is invoked each game tick.

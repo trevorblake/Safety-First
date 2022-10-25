@@ -4,8 +4,13 @@ import com.codename1.charts.util.ColorUtil;
 import com.codename1.ui.Button;
 import com.codename1.ui.Component;
 import com.codename1.ui.plaf.Border;
-import com.codename1.ui.plaf.Style;
 
+/**
+ * Custom Button class that is used in building 
+ * multiple Buttons using the same style
+ * @author Trevor Blake
+ *
+ */
 public class MyButton extends Button {
 
 	public MyButton(String title) {

@@ -5,6 +5,13 @@ import com.codename1.ui.Dialog;
 import com.codename1.ui.TextField;
 import com.codename1.ui.events.ActionEvent;
 
+/**
+ * Calls the collidedFlag GameWorld method based on action event
+ * Uses a dialog box to ask for the next flag number, and if it
+ * is the correct next flag, displays another dialog box indicating
+ * the flag was hit, and displays a dialog box if the flag was 
+ * incorrect as well
+ */
 public class FlagCommand extends Command
 {
 	private GameWorld tgw;

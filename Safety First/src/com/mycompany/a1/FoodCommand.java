@@ -3,6 +3,10 @@ package com.mycompany.a1;
 import com.codename1.ui.Command;
 import com.codename1.ui.events.ActionEvent;
 
+
+/**
+ * Calls the collidedFood GameWorld method based on action event
+ */
 public class FoodCommand extends Command
 {
 	private GameWorld tgw;
@@ -15,6 +19,5 @@ public class FoodCommand extends Command
 	public void actionPerformed(ActionEvent evt)
 	{
 		tgw.collidedFood();
-		System.out.println("\nThe ant has collided with a food station.");
 	}
 }

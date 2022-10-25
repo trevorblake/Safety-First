@@ -4,7 +4,7 @@ import com.codename1.charts.models.Point;
 import com.codename1.charts.util.ColorUtil;
 
 /**
- * Ant object class that holds all distinct fields related
+ * Ant Singleton class that holds all distinct fields related
  * to the in-game ant, such as maximumSpeed, foodLevel, 
  * foodConsumptionRate, healthLevel. Parent class is Movable.
  * Also implements ISteerable interface, making it a movable 
@@ -18,9 +18,10 @@ public class Ant extends Movable implements ISteerable
 	private int foodConsumptionRate; // How quickly the ant loses foodLevel
 	private int healthLevel; // The health of the ant
 	private int lastFlagReached; // The last flag reached by the ant
-	private static Ant theAnt;
+	private static Ant theAnt; //Ant object returned (Singleton Design)
+	
 	/**
-	 * Constructor for the Ant object. Calls to Movable parent class to create
+	 * Private Constructor for the Ant object. Calls to Movable parent class to create
 	 * a Movable Ant object. Set parameters to Movable as 8 for size, red for
 	 * color, heading at 0, speed of 4, location based on first flag instantiation
 	 * @param location when instantiated in the GameWorld class, the ant location
@@ -36,12 +37,18 @@ public class Ant extends Movable implements ISteerable
 		lastFlagReached = 1;
 	}
 	
+	/**
+	 * getter method for the Ant object. Calls to Movable parent class to create
+	 * a Movable Ant object. Calls to private constructor if there is no Ant object
+	 * otherwise returns first Ant object
+	 */
 	public static Ant getAnt(int size, int color, Point location, int heading, int speed)
 	{
 		if (theAnt == null)
 		{
 			theAnt = new Ant(size, color, location, heading, speed);
 		}
+		
 		return theAnt;
 	}
 

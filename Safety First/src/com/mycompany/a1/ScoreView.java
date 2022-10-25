@@ -10,6 +10,12 @@ import com.codename1.ui.Label;
 import com.codename1.ui.layouts.FlowLayout;
 import com.codename1.ui.plaf.Border;
 
+/**
+ * ScoreView is an observer of GameWorld and calls update based on changes that
+ * occur within GameWorld and is also a Container used in Game. 
+ * @author Trevor Blake
+ *
+ */
 public class ScoreView extends Container implements Observer 
 {
 	private Label lTime = new Label();
@@ -18,6 +24,10 @@ public class ScoreView extends Container implements Observer
 	private Label lFoodLevel = new Label();
 	private Label lHealthLevel = new Label();
 	private Label lSound = new Label();
+	
+	/**
+	 * Constructor that builds the ScoreView Container
+	 */
 	public ScoreView() 
 	{
 		this.setLayout(new FlowLayout(Component.CENTER));
@@ -40,10 +50,13 @@ public class ScoreView extends Container implements Observer
 		this.add(lFoodLevel).add(lHealthLevel).add(lSound);
 		revalidate();
 	}
+	
+	/**
+	 * Updates Ant information and GameWorld information 
+	 * that are connected to the labels of the ScoreView
+	 */
 	public void update (Observable o, Object arg) 
 	{
-		// code here to update labels from the game/ant state data
-		
 		if(arg instanceof Ant)
 		{
 			int lastFlag = ((Ant) arg).getLastFlagReached();

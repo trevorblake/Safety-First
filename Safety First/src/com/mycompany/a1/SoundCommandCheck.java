@@ -4,6 +4,10 @@ import com.codename1.ui.CheckBox;
 import com.codename1.ui.Command;
 import com.codename1.ui.events.ActionEvent;
 
+/**
+ * Command that changes the checkbox status of
+ * the game form if it has been clicked on
+ */
 public class SoundCommandCheck extends Command
 {
 	private Game myForm;
