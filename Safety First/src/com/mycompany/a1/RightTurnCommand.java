@@ -5,6 +5,7 @@ import com.codename1.ui.events.ActionEvent;
 
 /**
  * Calls the turnAnt GameWorld method based on action event
+ * and gives the parameter of 10 for turnAnt()
  */
 public class RightTurnCommand extends Command
 {
@@ -17,6 +18,6 @@ public class RightTurnCommand extends Command
 	@Override
 	public void actionPerformed(ActionEvent evt)
 	{
-		tgw.turnAnt(5);
+		tgw.turnAnt(10);
 	}
 }

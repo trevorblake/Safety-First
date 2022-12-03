@@ -4,12 +4,14 @@ import com.codename1.ui.layouts.BoxLayout;
 import com.codename1.ui.plaf.Border;
 import com.codename1.ui.layouts.FlowLayout;
 import com.codename1.ui.Toolbar;
+import com.codename1.ui.geom.Dimension;
 import com.codename1.charts.util.ColorUtil;
 import com.codename1.ui.CheckBox;
 import com.codename1.ui.Command;
 import com.codename1.ui.Component;
 import com.codename1.ui.Container;
 import com.codename1.ui.Form;
+import com.codename1.ui.util.UITimer;
 
 /**
  * Game class is called upon from the Starter class
@@ -17,12 +19,19 @@ import com.codename1.ui.Form;
  * using various commands
  * @author Trevor Blake
  */
-public class Game extends Form 
+public class Game extends Form implements Runnable
 {
 	private GameWorld gw;
 	private MapView mv;
 	private ScoreView sv;
+	private UITimer timer;
+	private static int TIME=20;
 	private Toolbar myToolbar = new Toolbar();
+	private MyButton bPosition, bPausePlay, bAccelerate, bBrake, bLeft, bRight;
+	private Command cPosition, cPausePlay, cAccelerate, cBrake, cLeft, cRight,
+					cExit, cToggleSound, cAboutInfo, cHelpInfo;
+	private CheckBox checkToggleSound;
+	private boolean soundEnabled; // used to check if sound was enabled prior to pressing pause
 	
 	
 	/**
@@ -32,6 +41,7 @@ public class Game extends Form
 	 */
 	public Game() 
 	{
+		timer = new UITimer(this);
 		gw = new GameWorld(); // create Observable GameWorld
 		mv = new MapView(); // create an Observer for the map
 		sv = new ScoreView(); // create an Observer for the game/ant state data
@@ -39,27 +49,26 @@ public class Game extends Form
 		gw.addObserver(sv); // register the score observer
 
 		//Create the various commands
-		Command cAccelerate = new AccelerateCommand(gw);
-		Command cBrake = new BrakeCommand(gw);
-		Command cLeftTurn = new LeftTurnCommand(gw);
-		Command cRightTurn = new RightTurnCommand(gw);
-		Command cCollideFlag = new FlagCommand(gw);
-		Command cCollideSpider = new SpiderCommand(gw);
-		Command cCollideFood = new FoodCommand(gw);
-		Command cTick = new TickCommand(gw);
-		Command cExit = new ExitCommand(gw);
-		Command cToggleSound = new SoundCommandCheck(this);
-		Command cAboutInfo = new AboutInfoCommand();
-		Command cHelpInfo = new HelpInfoCommand();
+		cAccelerate = new AccelerateCommand(gw);
+		cBrake = new BrakeCommand(gw);
+		cLeft = new LeftTurnCommand(gw);
+		cRight = new RightTurnCommand(gw);
+		cPosition = new PositionCommand(gw);
+
+		cPausePlay = new PausePlayCommand(this);
+		cExit = new ExitCommand(gw);
+		cToggleSound = new SoundCommandCheck(this);
+		cAboutInfo = new AboutInfoCommand();
+		cHelpInfo = new HelpInfoCommand();
 
 		//Create and build the toolbar
 		this.setToolbar(myToolbar);
 		myToolbar.setTitle("WalkIt Game");
-		myToolbar.addCommandToLeftSideMenu(cAccelerate);
-		CheckBox checkToggleSound = new CheckBox("Sound");
+		checkToggleSound = new CheckBox("Sound");
 		checkToggleSound.getAllStyles().setBgTransparency(255);
 		checkToggleSound.getAllStyles().setBgColor(ColorUtil.LTGRAY);
 		checkToggleSound.setCommand(cToggleSound);
+		soundEnabled = true;
 		myToolbar.addComponentToLeftSideMenu(checkToggleSound);
 		myToolbar.addCommandToLeftSideMenu(cAboutInfo);
 		myToolbar.addCommandToLeftSideMenu(cExit);
@@ -71,26 +80,22 @@ public class Game extends Form
 		westContainer.getAllStyles().setBgTransparency(255);
 		westContainer.getAllStyles().setBgColor(ColorUtil.rgb(240, 240, 240));
 		westContainer.getAllStyles().setBorder(Border.createLineBorder(1, ColorUtil.GRAY));
-		MyButton bAccelerate = new MyButton("Accelerate");
+		bAccelerate = new MyButton("Accelerate");
 		bAccelerate.setCommand(cAccelerate);
-		MyButton bLeftTurn = new MyButton("Left");
-		bLeftTurn.setCommand(cLeftTurn);
-		westContainer.add(bAccelerate).add(bLeftTurn);
+		bLeft = new MyButton("Left");
+		bLeft.setCommand(cLeft);
+		westContainer.add(bAccelerate).add(bLeft);
 		
 		//Create and build the southContainer
 		Container southContainer = new Container(new FlowLayout(Component.CENTER));
 		southContainer.getAllStyles().setBgTransparency(255);
 		southContainer.getAllStyles().setBgColor(ColorUtil.rgb(240, 240, 240));
 		southContainer.getAllStyles().setBorder(Border.createLineBorder(1, ColorUtil.GRAY));
-		MyButton bCollideFlag = new MyButton("Collide With Flag");
-		bCollideFlag.setCommand(cCollideFlag);
-		MyButton bCollideSpider = new MyButton("Collide With Spider");
-		bCollideSpider.setCommand(cCollideSpider);
-		MyButton bCollideFood = new MyButton("Collide With Food Station");
-		bCollideFood.setCommand(cCollideFood);
-		MyButton bTick = new MyButton("Tick");
-		bTick.setCommand(cTick);
-		southContainer.add(bCollideFlag).add(bCollideSpider).add(bCollideFood).add(bTick);
+		bPosition = new MyButton("Position");
+		bPosition.setCommand(cPosition);
+		bPausePlay = new MyButton("Pause");
+		bPausePlay.setCommand(cPausePlay);
+		southContainer.add(bPosition).add(bPausePlay);
 		
 		//Create and build the eastContainer
 		Container eastContainer = new Container(new BoxLayout(BoxLayout.Y_AXIS));
@@ -98,21 +103,11 @@ public class Game extends Form
 		eastContainer.getAllStyles().setBgTransparency(255);
 		eastContainer.getAllStyles().setBgColor(ColorUtil.rgb(240, 240, 240));
 		eastContainer.getAllStyles().setBorder(Border.createLineBorder(1, ColorUtil.GRAY));
-		MyButton bBrake = new MyButton("Brake");
+		bBrake = new MyButton("Brake");
 		bBrake.setCommand(cBrake);
-		MyButton bRightTurn = new MyButton("Right");
-		bRightTurn.setCommand(cRightTurn);
-		eastContainer.add(bBrake).add(bRightTurn);
-
-		//Creates the keybindings for certain commands
-		this.addKeyListener('a', cAccelerate);
-		this.addKeyListener('b', cBrake);
-		this.addKeyListener('l', cLeftTurn);
-		this.addKeyListener('r', cRightTurn);
-		this.addKeyListener('f', cCollideFood);
-		this.addKeyListener('g', cCollideSpider);
-		this.addKeyListener('t', cTick);
-		this.addKeyListener('x', cExit);
+		bRight = new MyButton("Right");
+		bRight.setCommand(cRight);
+		eastContainer.add(bBrake).add(bRight);
 		
 		//Builds the Game GUI using the containers and ScoreView and MapView
 		this.setLayout(new BorderLayout());
@@ -127,19 +122,132 @@ public class Game extends Form
 		gw.setHeight(mv.getHeight());
 		gw.setWidth(mv.getWidth());
 		gw.init();
+		gw.createSounds();
+		setCheckStatusVal(true);
+		revalidate();
+		play();
+		
+		
 	}
 
 	/**
-	 * Takes the bVal from the SoundCommandCheck and changes the
-	 * GameWorld sound value in order to update the ScoreView label
+	 * Takes the bVal and changes the GameWorld sound value and 
+	 * plays/pauses the background sound and also updates the ScoreView label
 	 * @param bVal comes from the SoundCommandCheck call
 	 */
 	public void setCheckStatusVal(boolean bVal)
 	{
-		if (bVal)
-		gw.setSound(true);
+		gw.setSound(bVal);
+		if(bVal)
+			gw.getBackgroundSound().play();
 		else
-		gw.setSound(false); 
+			gw.getBackgroundSound().pause();
+		revalidate();
+	}
+	
+	/**
+	 * Setter method to set soundEnabled and also
+	 * change the GameWorld's sound as well
+	 * @param soundEnabled sound value
+	 */
+	public void setSoundEnabled(boolean soundEnabled) 
+	{
+		this.soundEnabled = soundEnabled;
+		gw.setSound(soundEnabled);
+	}
+	
+	/**
+	 * Updates every time the timer goes off from the play method
+	 * and creates a dimension of the GameWorld size and width and 
+	 * passes it to the GameWorld tick method along with the TIME
+	 */
+	@Override
+	public void run() 
+	{
+		Dimension dCmpSize = new Dimension(gw.getWidth(), gw.getHeight());
+		gw.tick(TIME, dCmpSize);
+	}
+	
+	/**
+	 * Pauses the game by canceling the timer and disables 
+	 * various buttons and keyboard presses
+	 */
+	public void pause() 
+	{
+		//stop timer and disable buttons
+		this.timer.cancel();
+		bPausePlay.setText("Play");
+		bAccelerate.disable();
+		bBrake.disable();
+		bLeft.disable();
+		bRight.disable();
+		bPosition.enable();
+		checkToggleSound.setEnabled(false);
+		
+		//deselect the sound checkbox and turn off sound
+		checkToggleSound.setSelected(false);
+		setCheckStatusVal(false);
+		
+		//remove keyboard listeners
+		this.removeKeyListener('a', cAccelerate);
+		this.removeKeyListener('b', cBrake);
+		this.removeKeyListener('l', cLeft);
+		this.removeKeyListener('r', cRight);
+		
+		//remove accelerate from toolbar
+		myToolbar.removeCommand(cAccelerate);
+		
+		//set gameworld paused to true
+		gw.setPaused(true);
+		revalidate();
+	}
+		
+	/**
+	 * Plays the game by scheduling the timer and  
+	 * enables various buttons and keyboard presses
+	 */
+	public void play() 
+	{
+		//start timer and enable buttons
+		timer.schedule(TIME, true, this);
+		bPausePlay.setText("Pause");
+		bAccelerate.enable();
+		bBrake.enable();
+		bLeft.enable();
+		bRight.enable();
+		bPosition.disable();
+		checkToggleSound.setEnabled(true);
+		
+		//if sound is enabled, set checkbox to checked and turn on sound
+		if (soundEnabled) 
+		{
+			setCheckStatusVal(true);
+			checkToggleSound.setSelected(true);
+		}
+		
+		//add keyboard listeners
+		this.addKeyListener('a', cAccelerate);
+		this.addKeyListener('b', cBrake);
+		this.addKeyListener('l', cLeft);
+		this.addKeyListener('r', cRight);
+		this.addKeyListener('x', cExit);
+		
+		//add accelerate command to toolbar
+		myToolbar.addCommandToLeftSideMenu(cAccelerate);
+		
+		//set gameworld paused to false
+		gw.setPaused(false);
+		
+		//deselects all fixed objects
+		IIterator objects = gw.getWorldObjects().getIterator();
+		while(objects.hasNext())
+		{
+			GameObject obj = objects.getNext();
+			if(obj instanceof Fixed)
+			{
+				((Fixed)obj).setSelected(false);
+			}
+		}
 		revalidate();
 	}
 }

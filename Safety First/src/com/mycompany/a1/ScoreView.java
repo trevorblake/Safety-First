@@ -13,8 +13,6 @@ import com.codename1.ui.plaf.Border;
 /**
  * ScoreView is an observer of GameWorld and calls update based on changes that
  * occur within GameWorld and is also a Container used in Game. 
- * @author Trevor Blake
- *
  */
 public class ScoreView extends Container implements Observer 
 {

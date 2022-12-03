@@ -1,5 +1,7 @@
 package com.mycompany.a1;
 
+import java.util.Vector;
+
 import com.codename1.charts.models.Point;
 
  /**
@@ -8,11 +10,12 @@ import com.codename1.charts.models.Point;
   * size, color, and location
   * @author Trevor Blake
   */
-public abstract class GameObject 
+public abstract class GameObject implements IDrawable, ICollider
 {	
 	private final int size; // The size of the GameObject
 	private int color; // The color of the GameObject
 	private Point location; // The location of the GameObject
+	private Vector<GameObject> collisionList; //holds GameObjects colliding with this GameObject
 	
 	/**
 	 * Constructor method that is called upon instantiation of
@@ -27,6 +30,7 @@ public abstract class GameObject
 		this.size = size;
 		this.color = color;
 		this.location = location;
+		collisionList = new Vector<>();
 	}
 	
 	/**
@@ -54,6 +58,34 @@ public abstract class GameObject
 	public void setLocation(Point newLoc) 
 	{
 		location = newLoc;
+	}
+	
+	/**
+	 * Adds the object to the collision list
+	 * @param obj colliding object
+	 */
+	public void addToList(GameObject obj)
+	{
+		collisionList.add(obj);
+	}
+	
+	/**
+	 * Checks to see if the object is on the collision list
+	 * @param obj colliding object
+	 * @return boolean 
+	 */
+	public boolean checkList(GameObject obj)
+	{
+		return collisionList.contains(obj);
+	}
+	
+	/**
+	 * Removes the object from the collision list
+	 * @param obj colliding object
+	 */
+	public void removeFromList(GameObject obj)
+	{
+		collisionList.remove(obj);
 	}
 	
 	/**

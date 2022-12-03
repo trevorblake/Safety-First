@@ -14,7 +14,7 @@ public class AccelerateCommand extends Command
 		super("Accelerate");
 		tgw = gw;
 	}
-	
+	 
 	@Override
 	public void actionPerformed(ActionEvent evt)
 	{

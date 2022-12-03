@@ -2,6 +2,7 @@ package com.mycompany.a1;
 
 import com.codename1.charts.models.Point;
 import com.codename1.charts.util.ColorUtil;
+import com.codename1.ui.Graphics;
 
 /**
  * Flag class is a child of the Fixed object class
@@ -57,5 +58,86 @@ public class Flag extends Fixed
 				"," + ColorUtil.blue(getColor()) + 
 				"]" + " size=" + getSize() + 
 				" seqNum=" + sequenceNumber + "\n";
+	}
+
+	/**
+	 * Draw method that creates the flag's triangle
+	 * shape based on location and adds the sequence
+	 * number to the center
+	 */
+	@Override
+	public void draw(Graphics g, Point pCmpRelPrnt) 
+	{
+		int x = (int)(this.getLocation().getX() + pCmpRelPrnt.getX());
+		int y = (int)(this.getLocation().getY() + pCmpRelPrnt.getY());
+		int x1 = x - (getSize()/2);
+		int x2 = x + (getSize()/2);
+		int x3 = x;
+		int y1 = y;
+		int y2 = y;
+		int y3 = y + getSize();
+		int[] xPoints = {x1,x2,x3};
+		int[] yPoints = {y1,y2,y3};
+		g.setColor(this.getColor());
+		if(isSelected())
+		{
+			g.drawPolygon(xPoints, yPoints, 3);
+		}
+		else
+		{
+			g.fillPolygon(xPoints, yPoints, 3);
+			setSelected(false);
+		}
+		g.setColor(ColorUtil.BLACK);
+		g.drawString(""+sequenceNumber, x-10, y+15);
+	}
+
+	/**
+	 * Used to call the collidesWith method of ant.
+	 */
+	@Override
+	public boolean collidesWith(GameObject otherObject) 
+	{
+		if(otherObject instanceof Ant)
+		{
+			return (((Ant)otherObject).collidesWith(this));
+		}
+		return false;
+	}
+
+	/**
+	 * Used to call the handleCollision method of ant.
+	 */
+	@Override
+	public void handleCollision(GameObject otherObject, GameWorld gw) 
+	{
+		if (otherObject instanceof Ant)
+		{
+			((Ant)otherObject).handleCollision(this, gw);
+		}
+	}
+
+	/**
+	 * Setter method for setting if the object is selected
+	 */
+	@Override
+	public void setSelected(boolean b) {
+		super.setSelected(b);
+	}
+
+	/**
+	 * Getter method for checking if the object is selected
+	 */
+	@Override
+	public boolean isSelected() {
+		return super.isSelected();
+	}
+
+	/**
+	 * Calls the contains method of Fixed with same parameters
+	 */
+	@Override
+	public boolean contains(Point pPtrRelPrnt, Point pCmpRelPrnt) {
+		return super.contains(pPtrRelPrnt, pCmpRelPrnt);
 	}
 }

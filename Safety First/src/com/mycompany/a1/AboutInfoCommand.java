@@ -19,7 +19,7 @@ public class AboutInfoCommand extends Command
 	@Override
 	public void actionPerformed(ActionEvent evt)
 	{
-		Dialog.show("About", "Trevor Blake A2Prj \n CSC 133 Object-Oriented Computer"
+		Dialog.show("About", "Trevor Blake A3Prj \n CSC 133 Object-Oriented Computer"
 				+ " Graphics Programming - Fall 2022", "Ok", null);
 	}
 }

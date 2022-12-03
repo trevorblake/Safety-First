@@ -22,4 +22,16 @@ public class MyButton extends Button {
 		this.getAllStyles().setFgColor(ColorUtil.WHITE);
 		this.getAllStyles().setBorder(Border.createLineBorder(3,ColorUtil.BLACK));
 	}
+	
+	public void disable() {
+		this.setEnabled(false);
+		this.getAllStyles().setBgColor(ColorUtil.WHITE);
+		this.getAllStyles().setFgColor(ColorUtil.BLUE);
+	}
+	
+	public void enable() {
+		this.setEnabled(true);
+		this.getAllStyles().setBgColor(ColorUtil.BLUE);
+		this.getAllStyles().setFgColor(ColorUtil.WHITE);
+	}
 }

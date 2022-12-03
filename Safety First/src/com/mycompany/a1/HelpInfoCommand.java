@@ -19,7 +19,6 @@ public class HelpInfoCommand extends Command
 	public void actionPerformed(ActionEvent evt)
 	{
 		Dialog.show("Commands", "a: accelerate the ant, b: brake the ant,"
-				+ " l: left turn, r: right turn, f: collide with foodstation, "
-				+ "g: collide with spider, t: tick, x: exit", "Ok", null);
+				+ " l: left turn, r: right turn, x: exit", "Ok", null);
 	}
 }

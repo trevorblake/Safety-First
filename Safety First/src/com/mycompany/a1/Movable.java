@@ -1,6 +1,7 @@
 package com.mycompany.a1;
 
 import com.codename1.charts.models.Point;
+import com.codename1.ui.geom.Dimension;
 
 /**
  * Movable is the abstract child class of GameObject, and 
@@ -73,5 +74,5 @@ public abstract class Movable extends GameObject
 	 * Abstract method that forces all child classes of 
 	 * Movable to have a move method
 	 */
-	public abstract void move();
+	public abstract void move(int time, Dimension dCmpSize);
 }

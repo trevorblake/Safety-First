@@ -23,10 +23,12 @@ public class SoundCommandCheck extends Command
 		if (((CheckBox)evt.getComponent()).isSelected())
 		{
 			myForm.setCheckStatusVal(true);
+			myForm.setSoundEnabled(true);
 		}
 		else
 		{
 			myForm.setCheckStatusVal(false);
+			myForm.setSoundEnabled(false);
 		}
 	}
 }

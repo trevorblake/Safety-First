@@ -2,6 +2,8 @@ package com.mycompany.a1;
 
 import com.codename1.charts.models.Point;
 import com.codename1.charts.util.ColorUtil;
+import com.codename1.ui.Graphics;
+import com.codename1.ui.geom.Dimension;
 
 /**
  * Ant Singleton class that holds all distinct fields related
@@ -30,8 +32,8 @@ public class Ant extends Movable implements ISteerable
 	private Ant(int size, int color, Point location, int heading, int speed) 
 	{
 		super(size, color, location, heading, speed);
-		maximumSpeed = 20;
-		foodLevel = 15;
+		maximumSpeed = 300;
+		foodLevel = 3000;
 		foodConsumptionRate = 1;
 		healthLevel = 10;
 		lastFlagReached = 1;
@@ -143,11 +145,13 @@ public class Ant extends Movable implements ISteerable
 	 * From the Movable abstract parent class this method moves the ant
 	 * using the heading and the speed of the ant,  it determines
 	 * the next location of the ant on the next tick using trig functions
+	 * @param dCmpSize 
 	 */
-	public void move() 
+	public void move(int time, Dimension dCmpSize) 
 	{
-		double deltaX = Math.cos(Math.toRadians(90 - getHeading())) * getSpeed();
-		double deltaY = Math.sin(Math.toRadians(90 - getHeading())) * getSpeed();
+		int dist = getSpeed()*time/1000;
+		double deltaX = Math.cos(Math.toRadians(90 - getHeading())) * dist;
+		double deltaY = Math.sin(Math.toRadians(90 - getHeading())) * dist;
 		float newX = (float) (getLocation().getX() + deltaX);
 		float newY = (float) (getLocation().getY() + deltaY);
 		getLocation().setX(newX);
@@ -195,6 +199,85 @@ public class Ant extends Movable implements ISteerable
 				" size=" + getSize() + "\n     " + 
 				"maxSpeed=" + getMaximumSpeed() + 
 				" foodConsumptionRate=" + getFoodConsumptionRate() + "\n";
+	}
+
+	/**
+	 * Draws the ant object on the screen as a red circle
+	 */
+	@Override
+	public void draw(Graphics g, Point pCmpRelPrnt) 
+	{
+		int x = (int)(this.getLocation().getX() + pCmpRelPrnt.getX());
+		int y = (int)(this.getLocation().getY() + pCmpRelPrnt.getY());
+		g.setColor(this.getColor());
+		g.fillArc(x, y, getSize(), getSize(), 0, 360);
+		
+	}
+
+	/**
+	 * Checks if the ant is colliding with another object, if so then
+	 * it returns true
+	 */
+	@Override
+	public boolean collidesWith(GameObject otherObject) 
+	{
+		int r1 = (int)(getLocation().getX() + getSize()/2);
+		int l1 = (int)(getLocation().getX() - getSize()/2);
+		int t1 = (int)(getLocation().getY() + getSize()/2);
+		int b1 = (int)(getLocation().getY() - getSize()/2);
+
+		//since spiders and flags are triangles, this makes collisions more accurate looking
+		if (otherObject instanceof Spider || otherObject instanceof Flag)
+		{
+			int r2 = (int)(otherObject.getLocation().getX() + otherObject.getSize()/4);
+			int l2 = (int)(otherObject.getLocation().getX() - otherObject.getSize());
+			int t2 = (int)(otherObject.getLocation().getY() + otherObject.getSize()/2);
+			int b2 = (int)(otherObject.getLocation().getY() - otherObject.getSize()/2);
+			
+			if(r1 < l2 || l1 > r2 || t2 < b1 || t1 < b2)
+			{
+				return false;
+			}
+		}
+		
+		//collision detection for boxes, which as of now are only the foodstation
+		if(otherObject instanceof FoodStation)
+		{
+			int r2 = (int)(otherObject.getLocation().getX() + otherObject.getSize()/2);
+			int l2 = (int)(otherObject.getLocation().getX() - otherObject.getSize()/2);
+			int t2 = (int)(otherObject.getLocation().getY() + otherObject.getSize()/2);
+			int b2 = (int)(otherObject.getLocation().getY() - otherObject.getSize()/2);
+			
+			if(r1 < l2 || l1 > r2 || t2 < b1 || t1 < b2)
+			{
+				return false;
+			}
+		}		
+		return true;
+
+	}
+
+	/**
+	 * Handles collision between the ant and different GameObjects by
+	 * calling the respective collision method in GameWorld
+	 */
+	@Override
+	public void handleCollision(GameObject otherObject, GameWorld gw) 
+	{	    
+		if(otherObject instanceof Flag)
+		{
+			gw.collidedFlag(this, ((Flag)otherObject));
+		}
+		
+		if(otherObject instanceof FoodStation)
+		{
+			gw.collidedFood(this, ((FoodStation)otherObject));
+		}
+		
+		if(otherObject instanceof Spider)
+		{
+			gw.collidedSpider(this);
+		}
 	}
 
 

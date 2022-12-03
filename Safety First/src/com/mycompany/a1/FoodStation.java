@@ -2,6 +2,7 @@ package com.mycompany.a1;
 
 import com.codename1.charts.models.Point;
 import com.codename1.charts.util.ColorUtil;
+import com.codename1.ui.Graphics;
 
 /**
  * FoodStation is a child class of the Fixed object 
@@ -58,5 +59,81 @@ public class FoodStation extends Fixed
 				ColorUtil.blue(getColor()) + "]" + 
 				" size=" + getSize() + 
 				" capacity=" + capacity + "\n";
+	}
+
+	/**
+	 * Draw method that creates the foodstation's
+	 * square shape based on location and adds the 
+	 * food capacity to the center
+	 */
+	@Override
+	public void draw(Graphics g, Point pCmpRelPrnt) {
+		int x = (int)(this.getLocation().getX() + pCmpRelPrnt.getX());
+		int y = (int)(this.getLocation().getY() + pCmpRelPrnt.getY());
+		g.setColor(this.getColor());
+		if (isSelected())
+		{
+			g.drawRect(x, y, getSize(), getSize());
+		}
+		
+		else
+		{
+			g.fillRect(x, y, getSize(), getSize());
+			setSelected(false);
+		}
+		g.setColor(ColorUtil.BLACK);
+		g.drawString(""+capacity, (int)(x+getSize()/3.3), (int)(y+getSize()/3.0));
+	}
+
+	/**
+	 * Used to call the collidesWith method of ant.
+	 */
+	@Override
+	public boolean collidesWith(GameObject otherObject) 
+	{
+		if(otherObject instanceof Ant)
+		{
+			return (((Ant)otherObject).collidesWith(this));
+		}
+		return false;
+	}
+
+	/**
+	 * Used to call the handleCollision method of ant.
+	 */
+	@Override
+	public void handleCollision(GameObject otherObject, GameWorld gw) 
+	{
+		if (otherObject instanceof Ant)
+		{
+			((Ant)otherObject).handleCollision(this, gw);
+		}
+	}
+
+	/**
+	 * Setter method for setting if the object is selected
+	 */
+	@Override
+	public void setSelected(boolean b) 
+	{
+		super.setSelected(b);
+	}
+
+	/**
+	 * Getter method for checking if the object is selected
+	 */
+	@Override
+	public boolean isSelected() 
+	{
+		return super.isSelected();
+	}
+
+	/**
+	 * Calls the contains method of Fixed with same parameters
+	 */
+	@Override
+	public boolean contains(Point pPtrRelPrnt, Point pCmpRelPrnt) 
+	{
+		return super.contains(pPtrRelPrnt, pCmpRelPrnt);
 	}
 }
